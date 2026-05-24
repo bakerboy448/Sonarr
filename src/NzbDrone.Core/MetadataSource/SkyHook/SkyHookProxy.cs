@@ -147,17 +147,17 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             catch (HttpException ex)
             {
                 _logger.Warn(ex);
-                throw new SkyHookException("Search for '{0}' failed. Unable to communicate with SkyHook.", ex, title);
+                throw new SkyHookException("Search for '{0}' failed. Unable to communicate with SkyHook. {1}", ex, title, ex.Message);
             }
             catch (WebException ex)
             {
                 _logger.Warn(ex);
-                throw new SkyHookException("Search for '{0}' failed. Unable to communicate with SkyHook.", ex, title, ex.Message);
+                throw new SkyHookException("Search for '{0}' failed. Unable to communicate with SkyHook. {1}", ex, title, ex.Message);
             }
             catch (Exception ex)
             {
                 _logger.Warn(ex);
-                throw new SkyHookException("Search for '{0}' failed. Invalid response received from SkyHook.", ex, title);
+                throw new SkyHookException("Search for '{0}' failed. Invalid response received from SkyHook. {1}", ex, title, ex.Message);
             }
         }
 
@@ -188,7 +188,14 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 series.TvMazeId = show.TvMazeId.Value;
             }
 
+            if (show.TmdbId.HasValue)
+            {
+                series.TmdbId = show.TmdbId.Value;
+            }
+
             series.ImdbId = show.ImdbId;
+            series.MalIds = show.MalIds;
+            series.AniListIds = show.AniListIds;
             series.Title = show.Title;
             series.CleanTitle = Parser.Parser.CleanSeriesTitle(show.Title);
             series.SortTitle = SeriesTitleNormalizer.Normalize(show.Title, show.TvdbId);

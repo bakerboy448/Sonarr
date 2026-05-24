@@ -933,6 +933,26 @@
       }
     },
     "/api/v3/customformat": {
+      "get": {
+        "tags": [
+          "CustomFormat"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomFormatResource"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "CustomFormat"
@@ -963,26 +983,6 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CustomFormatResource"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "CustomFormat"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CustomFormatResource"
-                  }
                 }
               }
             }
@@ -1083,6 +1083,53 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v3/customformat/bulk": {
+      "put": {
+        "tags": [
+          "CustomFormat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomFormatBulkResource"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFormatResource"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CustomFormat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomFormatBulkResource"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -1513,19 +1560,20 @@
         ],
         "parameters": [
           {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
             "name": "forceSave",
             "in": "query",
             "schema": {
               "type": "boolean",
               "default": false
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1878,6 +1926,22 @@
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "includeSeries",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "includeEpisodeFile",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           },
           {
@@ -2766,19 +2830,20 @@
         ],
         "parameters": [
           {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
             "name": "forceSave",
             "in": "query",
             "schema": {
               "type": "boolean",
               "default": false
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -3301,6 +3366,37 @@
         }
       }
     },
+    "/api/v3/importlistexclusion/bulk": {
+      "delete": {
+        "tags": [
+          "ImportListExclusion"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportListExclusionBulkResource"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportListExclusionBulkResource"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportListExclusionBulkResource"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v3/indexer": {
       "get": {
         "tags": [
@@ -3366,19 +3462,20 @@
         ],
         "parameters": [
           {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
             "name": "forceSave",
             "in": "query",
             "schema": {
               "type": "boolean",
               "default": false
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -4406,19 +4503,20 @@
         ],
         "parameters": [
           {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
             "name": "forceSave",
             "in": "query",
             "schema": {
               "type": "boolean",
               "default": false
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -4841,6 +4939,13 @@
             }
           },
           {
+            "name": "customColonReplacementFormat",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "multiEpisodeStyle",
             "in": "query",
             "schema": {
@@ -4978,19 +5083,20 @@
         ],
         "parameters": [
           {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
             "name": "forceSave",
             "in": "query",
             "schema": {
               "type": "boolean",
               "default": false
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -5397,6 +5503,35 @@
         }
       }
     },
+    "/api/v3/qualitydefinition/limits": {
+      "get": {
+        "tags": [
+          "QualityDefinition"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityDefinitionLimitsResource"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityDefinitionLimitsResource"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityDefinitionLimitsResource"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v3/qualityprofile": {
       "post": {
         "tags": [
@@ -5796,8 +5931,21 @@
             "name": "quality",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/QueueStatus"
+              }
             }
           }
         ],
@@ -6633,17 +6781,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeriesResource"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeriesResource"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SeriesResource"
                 }
@@ -6725,17 +6863,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeriesResource"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeriesResource"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SeriesResource"
                 }
@@ -6842,6 +6970,29 @@
         }
       }
     },
+    "/api/v3/series/{id}/folder": {
+      "get": {
+        "tags": [
+          "SeriesFolder"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v3/series/import": {
       "post": {
         "tags": [
@@ -6898,7 +7049,33 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SeriesResource"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SeriesResource"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SeriesResource"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -7968,6 +8145,25 @@
         },
         "additionalProperties": false
       },
+      "CustomFormatBulkResource": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "includeCustomFormatWhenRenaming": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CustomFormatResource": {
         "type": "object",
         "properties": {
@@ -8429,6 +8625,11 @@
             "format": "date-time",
             "nullable": true
           },
+          "lastSearchTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "runtime": {
             "type": "integer",
             "format": "int32"
@@ -8481,10 +8682,6 @@
           "grabDate": {
             "type": "string",
             "format": "date-time",
-            "nullable": true
-          },
-          "seriesTitle": {
-            "type": "string",
             "nullable": true
           },
           "series": {
@@ -8824,6 +9021,10 @@
             "type": "string",
             "nullable": true
           },
+          "logSizeLimit": {
+            "type": "integer",
+            "format": "int32"
+          },
           "consoleLogLevel": {
             "type": "string",
             "nullable": true
@@ -8909,6 +9110,9 @@
           "backupRetention": {
             "type": "integer",
             "format": "int32"
+          },
+          "trustCgnatIpAddresses": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -9006,6 +9210,21 @@
           "listSyncTag": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImportListExclusionBulkResource": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -9163,6 +9382,19 @@
           "advanced"
         ],
         "type": "string"
+      },
+      "ImportRejectionResource": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/RejectionType"
+          }
+        },
+        "additionalProperties": false
       },
       "IndexerBulkResource": {
         "type": "object",
@@ -9620,7 +9852,7 @@
           "rejections": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Rejection"
+              "$ref": "#/components/schemas/ImportRejectionResource"
             },
             "nullable": true
           }
@@ -9717,7 +9949,7 @@
           "rejections": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Rejection"
+              "$ref": "#/components/schemas/ImportRejectionResource"
             },
             "nullable": true
           }
@@ -10010,6 +10242,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "customColonReplacementFormat": {
+            "type": "string",
+            "nullable": true
+          },
           "multiEpisodeStyle": {
             "type": "integer",
             "format": "int32"
@@ -10114,6 +10350,9 @@
           "onUpgrade": {
             "type": "boolean"
           },
+          "onImportComplete": {
+            "type": "boolean"
+          },
           "onRename": {
             "type": "boolean"
           },
@@ -10151,6 +10390,9 @@
             "type": "boolean"
           },
           "supportsOnUpgrade": {
+            "type": "boolean"
+          },
+          "supportsOnImportComplete": {
             "type": "boolean"
           },
           "supportsOnRename": {
@@ -10451,6 +10693,20 @@
         },
         "additionalProperties": false
       },
+      "QualityDefinitionLimitsResource": {
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "max": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "QualityDefinitionResource": {
         "type": "object",
         "properties": {
@@ -10559,6 +10815,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "minUpgradeFormatScore": {
+            "type": "integer",
+            "format": "int32"
+          },
           "formatItems": {
             "type": "array",
             "items": {
@@ -10653,15 +10913,6 @@
             "type": "string",
             "nullable": true
           },
-          "sizeleft": {
-            "type": "number",
-            "format": "double"
-          },
-          "timeleft": {
-            "type": "string",
-            "format": "date-span",
-            "nullable": true
-          },
           "estimatedCompletionTime": {
             "type": "string",
             "format": "date-time",
@@ -10673,8 +10924,7 @@
             "nullable": true
           },
           "status": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/QueueStatus"
           },
           "trackedDownloadStatus": {
             "$ref": "#/components/schemas/TrackedDownloadStatus"
@@ -10717,6 +10967,17 @@
           },
           "episodeHasFile": {
             "type": "boolean"
+          },
+          "sizeleft": {
+            "type": "number",
+            "format": "double",
+            "deprecated": true
+          },
+          "timeleft": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true,
+            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -10752,6 +11013,21 @@
           }
         },
         "additionalProperties": false
+      },
+      "QueueStatus": {
+        "enum": [
+          "unknown",
+          "queued",
+          "paused",
+          "downloading",
+          "completed",
+          "failed",
+          "warning",
+          "delay",
+          "downloadClientUnavailable",
+          "fallback"
+        ],
+        "type": "string"
       },
       "QueueStatusResource": {
         "type": "object",
@@ -10797,19 +11073,6 @@
           "value": {
             "type": "number",
             "format": "double"
-          }
-        },
-        "additionalProperties": false
-      },
-      "Rejection": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "nullable": true
-          },
-          "type": {
-            "$ref": "#/components/schemas/RejectionType"
           }
         },
         "additionalProperties": false
@@ -11036,6 +11299,10 @@
           "tvRageId": {
             "type": "integer",
             "format": "int32"
+          },
+          "imdbId": {
+            "type": "string",
+            "nullable": true
           },
           "rejections": {
             "type": "array",
@@ -11585,6 +11852,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "tmdbId": {
+            "type": "integer",
+            "format": "int32"
+          },
           "firstAired": {
             "type": "string",
             "format": "date-time",
@@ -12007,6 +12278,7 @@
       "TrackedDownloadState": {
         "enum": [
           "downloading",
+          "importBlocked",
           "importPending",
           "importing",
           "imported",
@@ -12194,7 +12466,7 @@
       },
       "apikey": {
         "type": "apiKey",
-        "description": "Apikey passed as header",
+        "description": "Apikey passed as query parameter",
         "name": "apikey",
         "in": "query"
       }

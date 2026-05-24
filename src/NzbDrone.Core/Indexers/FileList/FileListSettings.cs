@@ -38,6 +38,7 @@ namespace NzbDrone.Core.Indexers.FileList
 
             AnimeCategories = Array.Empty<int>();
             MultiLanguages = Array.Empty<int>();
+            FailDownloads = Array.Empty<int>();
         }
 
         [FieldDefinition(0, Label = "Username", Privacy = PrivacyLevel.UserName)]
@@ -67,6 +68,9 @@ namespace NzbDrone.Core.Indexers.FileList
         [FieldDefinition(8, Type = FieldType.Checkbox, Label = "IndexerSettingsRejectBlocklistedTorrentHashes", HelpText = "IndexerSettingsRejectBlocklistedTorrentHashesHelpText", Advanced = true)]
         public bool RejectBlocklistedTorrentHashesWhileGrabbing { get; set; }
 
+        [FieldDefinition(9, Type = FieldType.Select, SelectOptions = typeof(FailDownloads), Label = "IndexerSettingsFailDownloads", HelpText = "IndexerSettingsFailDownloadsHelpText", Advanced = true)]
+        public IEnumerable<int> FailDownloads { get; set; }
+
         public NzbDroneValidationResult Validate()
         {
             return new NzbDroneValidationResult(Validator.Validate(this));
@@ -75,17 +79,19 @@ namespace NzbDrone.Core.Indexers.FileList
 
     public enum FileListCategories
     {
-        [FieldOption]
+        [FieldOption(Label = "Anime")]
         Anime = 24,
-        [FieldOption]
+        [FieldOption(Label = "Animation")]
         Animation = 15,
-        [FieldOption]
+        [FieldOption(Label = "TV 4K")]
         TV_4K = 27,
-        [FieldOption]
+        [FieldOption(Label = "TV HD")]
         TV_HD = 21,
-        [FieldOption]
+        [FieldOption(Label = "TV SD")]
         TV_SD = 23,
-        [FieldOption]
-        Sport = 13
+        [FieldOption(Label = "Sport")]
+        Sport = 13,
+        [FieldOption(Label = "RO Dubbed")]
+        RoDubbed = 28
     }
 }

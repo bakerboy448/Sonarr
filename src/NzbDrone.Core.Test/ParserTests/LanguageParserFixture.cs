@@ -41,6 +41,8 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("Title.the.Italian.Series.S01E01.The.Family.720p.HDTV.x264-FTP")]
         [TestCase("Title.the.Italy.Series.S02E01.720p.HDTV.x264-TLA")]
         [TestCase("Series Title - S01E01 - Pilot.en.sub")]
+        [TestCase("Series.Title.S01E01.SUBFRENCH.1080p.WEB.x264-GROUP")]
+
         public void should_parse_language_unknown(string postTitle)
         {
             var result = LanguageParser.ParseLanguages(postTitle);
@@ -64,6 +66,7 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("Title.S01.720p.VFF.WEB-DL.AAC2.0.H.264-BTN")]
         [TestCase("Title.S01.720p.VFQ.WEB-DL.AAC2.0.H.264-BTN")]
         [TestCase("Title.S01.720p.TRUEFRENCH.WEB-DL.AAC2.0.H.264-BTN")]
+        [TestCase("Series In The Middle S01 Multi VFI VO 1080p WEB x265 HEVC AAC 5.1-Papaya")]
         public void should_parse_language_french(string postTitle)
         {
             var result = LanguageParser.ParseLanguages(postTitle);
@@ -427,6 +430,16 @@ namespace NzbDrone.Core.Test.ParserTests
             result.Languages.Should().Contain(Language.German);
             result.Languages.Should().Contain(Language.Original);
             result.Languages.Should().Contain(Language.English);
+        }
+
+        [TestCase("Series.Title.S01E01.Original.1080P.WEB.H264-RlsGrp")]
+        [TestCase("Series.Title.S01E01.Orig.1080P.WEB.H264-RlsGrp")]
+        [TestCase("Series / S1E1-10 of 10 [2023, HEVC, HDR10, Dolby Vision, WEB-DL 2160p] [Hybrid] 3 XX + Original")]
+        public void should_parse_original_title_from_release_name(string postTitle)
+        {
+            var result = Parser.Parser.ParseTitle(postTitle);
+            result.Languages.Count.Should().Be(1);
+            result.Languages.Should().Contain(Language.Original);
         }
 
         [TestCase("Остання серія (Сезон 1) / The Last Series (Season 1) (2024) WEB-DLRip-AVC 2xUkr/Eng | Sub Ukr/Eng")]

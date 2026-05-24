@@ -34,6 +34,7 @@ namespace Sonarr.Api.V3.Series
                                 IHandle<SeriesEditedEvent>,
                                 IHandle<SeriesDeletedEvent>,
                                 IHandle<SeriesRenamedEvent>,
+                                IHandle<SeriesBulkEditedEvent>,
                                 IHandle<MediaCoversUpdatedEvent>
     {
         private readonly ISeriesService _seriesService;
@@ -59,6 +60,7 @@ namespace Sonarr.Api.V3.Series
                             SeriesAncestorValidator seriesAncestorValidator,
                             SystemFolderValidator systemFolderValidator,
                             QualityProfileExistsValidator qualityProfileExistsValidator,
+                            RootFolderExistsValidator rootFolderExistsValidator,
                             SeriesFolderAsRootFolderValidator seriesFolderAsRootFolderValidator)
             : base(signalRBroadcaster)
         {
@@ -71,25 +73,34 @@ namespace Sonarr.Api.V3.Series
             _commandQueueManager = commandQueueManager;
             _rootFolderService = rootFolderService;
 
-            Http.Validation.RuleBuilderExtensions.ValidId(SharedValidator.RuleFor(s => s.QualityProfileId));
-
-            SharedValidator.RuleFor(s => s.Path)
-                .Cascade(CascadeMode.Stop)
+            SharedValidator.RuleFor(s => s.Path).Cascade(CascadeMode.Stop)
                 .IsValidPath()
-                           .SetValidator(rootFolderValidator)
-                           .SetValidator(mappedNetworkDriveValidator)
-                           .SetValidator(seriesPathValidator)
-                           .SetValidator(seriesAncestorValidator)
-                           .SetValidator(systemFolderValidator)
-                           .When(s => !s.Path.IsNullOrWhiteSpace());
+                .SetValidator(rootFolderValidator)
+                .SetValidator(mappedNetworkDriveValidator)
+                .SetValidator(seriesPathValidator)
+                .SetValidator(seriesAncestorValidator)
+                .SetValidator(systemFolderValidator)
+                .When(s => s.Path.IsNotNullOrWhiteSpace());
 
-            SharedValidator.RuleFor(s => s.QualityProfileId).SetValidator(qualityProfileExistsValidator);
+            PostValidator.RuleFor(s => s.Path).Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .IsValidPath()
+                .When(s => s.RootFolderPath.IsNullOrWhiteSpace());
+            PostValidator.RuleFor(s => s.RootFolderPath).Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .IsValidPath()
+                .SetValidator(rootFolderExistsValidator)
+                .SetValidator(seriesFolderAsRootFolderValidator)
+                .When(s => s.Path.IsNullOrWhiteSpace());
 
-            PostValidator.RuleFor(s => s.Path).IsValidPath().When(s => s.RootFolderPath.IsNullOrWhiteSpace());
-            PostValidator.RuleFor(s => s.RootFolderPath)
-                         .IsValidPath()
-                         .SetValidator(seriesFolderAsRootFolderValidator)
-                         .When(s => s.Path.IsNullOrWhiteSpace());
+            PutValidator.RuleFor(s => s.Path).Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .IsValidPath();
+
+            SharedValidator.RuleFor(s => s.QualityProfileId).Cascade(CascadeMode.Stop)
+                .ValidId()
+                .SetValidator(qualityProfileExistsValidator);
+
             PostValidator.RuleFor(s => s.Title).NotEmpty();
             PostValidator.RuleFor(s => s.TvdbId).GreaterThan(0).SetValidator(seriesExistsValidator);
         }
@@ -156,6 +167,7 @@ namespace Sonarr.Api.V3.Series
 
         [RestPostById]
         [Consumes("application/json")]
+        [Produces("application/json")]
         public ActionResult<SeriesResource> AddSeries([FromBody] SeriesResource seriesResource)
         {
             var series = _addSeriesService.AddSeries(seriesResource.ToModel());
@@ -165,6 +177,7 @@ namespace Sonarr.Api.V3.Series
 
         [RestPutById]
         [Consumes("application/json")]
+        [Produces("application/json")]
         public ActionResult<SeriesResource> UpdateSeries([FromBody] SeriesResource seriesResource, [FromQuery] bool moveFiles = false)
         {
             var series = _seriesService.GetSeries(seriesResource.Id);
@@ -175,12 +188,11 @@ namespace Sonarr.Api.V3.Series
                 var destinationPath = seriesResource.Path;
 
                 _commandQueueManager.Push(new MoveSeriesCommand
-                                          {
-                                              SeriesId = series.Id,
-                                              SourcePath = sourcePath,
-                                              DestinationPath = destinationPath,
-                                              Trigger = CommandTrigger.Manual
-                                          });
+                {
+                    SeriesId = series.Id,
+                    SourcePath = sourcePath,
+                    DestinationPath = destinationPath
+                }, trigger: CommandTrigger.Manual);
             }
 
             var model = seriesResource.ToModel(series);
@@ -317,7 +329,7 @@ namespace Sonarr.Api.V3.Series
         {
             foreach (var series in message.Series)
             {
-                BroadcastResourceChange(ModelAction.Deleted, series.ToResource());
+                BroadcastResourceChange(ModelAction.Deleted, GetSeriesResource(series, false));
             }
         }
 
@@ -325,6 +337,15 @@ namespace Sonarr.Api.V3.Series
         public void Handle(SeriesRenamedEvent message)
         {
             BroadcastResourceChange(ModelAction.Updated, message.Series.Id);
+        }
+
+        [NonAction]
+        public void Handle(SeriesBulkEditedEvent message)
+        {
+            foreach (var series in message.Series)
+            {
+                BroadcastResourceChange(ModelAction.Updated, GetSeriesResource(series, false));
+            }
         }
 
         [NonAction]

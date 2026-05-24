@@ -29,7 +29,6 @@
     "AnalyticsEnabledHelpText": "Envieu informació anònima d'ús i errors als servidors de {appName}. Això inclou informació sobre el vostre navegador, quines pàgines {appName} WebUI feu servir, informes d'errors, així com el sistema operatiu i la versió de l'entorn d'execució. Utilitzarem aquesta informació per a prioritzar les funcions i les correccions d'errors.",
     "AuthenticationRequiredHelpText": "Canvia per a quines sol·licituds cal autenticar. No canvieu tret que entengueu els riscos.",
     "BypassDelayIfAboveCustomFormatScoreHelpText": "Habiliteu l'omissió quan la versió tingui una puntuació superior a la puntuació mínima per al format personalitzat",
-    "FailedToUpdateSettings": "No s'ha pogut actualitzar la configuració",
     "Ended": "Acabat",
     "Language": "Idioma",
     "NextAiring": "Propera emissió",
@@ -114,7 +113,6 @@
     "ImportMechanismEnableCompletedDownloadHandlingIfPossibleMultiComputerHealthCheckMessage": "Activa la gestió de baixades completades si és possible (no admet diversos ordinadors)",
     "InfoUrl": "URL d'informació",
     "NoDownloadClientsFound": "No s'han trobat clients de baixada",
-    "NoHistoryBlocklist": "Sense historial de llistes de bloqueig",
     "NoHistoryFound": "No s'ha trobat cap historial",
     "NoIndexersFound": "No s'han trobat indexadors",
     "NoImportListsFound": "No s'han trobat llistes d'importació",
@@ -752,5 +750,13 @@
     "Organize": "Organitza",
     "Search": "Cerca",
     "SelectDropdown": "Seleccioneu...",
-    "Shutdown": "Apaga"
+    "Shutdown": "Apaga",
+    "ClickToChangeReleaseType": "Feu clic per canviar el tipus de llançament",
+    "BlocklistFilterHasNoItems": "El filtre de la llista de bloqueig seleccionat no conté elements",
+    "CustomColonReplacement": "Reemplaçament personalitzat de dos punts",
+    "CountVotes": "{votes} vots",
+    "Completed": "Completat",
+    "ContinuingOnly": "Només en emissió",
+    "CleanLibraryLevel": "Neteja el nivell de la llibreria",
+    "CountCustomFormatsSelected": "{count} format(s) personalitzat(s) seleccionat(s)"
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using NzbDrone.Core.Languages;
 using NzbDrone.Core.Tv;
 
 namespace NzbDrone.Core.Notifications.Webhook
@@ -12,12 +13,14 @@ namespace NzbDrone.Core.Notifications.Webhook
         public string Path { get; set; }
         public int TvdbId { get; set; }
         public int TvMazeId { get; set; }
+        public int TmdbId { get; set; }
         public string ImdbId { get; set; }
         public SeriesTypes Type { get; set; }
         public int Year { get; set; }
         public List<string> Genres { get; set; }
         public List<WebhookImage> Images { get; set; }
         public List<string> Tags { get; set; }
+        public Language OriginalLanguage { get; set; }
 
         public WebhookSeries()
         {
@@ -31,12 +34,14 @@ namespace NzbDrone.Core.Notifications.Webhook
             Path = series.Path;
             TvdbId = series.TvdbId;
             TvMazeId = series.TvMazeId;
+            TmdbId = series.TmdbId;
             ImdbId = series.ImdbId;
             Type = series.SeriesType;
             Year = series.Year;
             Genres = series.Genres;
             Images = series.Images.Select(i => new WebhookImage(i)).ToList();
             Tags = tags;
+            OriginalLanguage = series.OriginalLanguage;
         }
     }
 }

@@ -5,7 +5,7 @@ import { icons } from 'Helpers/Props';
 import createUISettingsSelector from 'Store/Selectors/createUISettingsSelector';
 import dimensions from 'Styles/Variables/dimensions';
 import QualityProfile from 'typings/QualityProfile';
-import { UiSettings } from 'typings/UiSettings';
+import UiSettings from 'typings/Settings/UiSettings';
 import formatDateTime from 'Utilities/Date/formatDateTime';
 import getRelativeDate from 'Utilities/Date/getRelativeDate';
 import formatBytes from 'Utilities/Number/formatBytes';
@@ -137,14 +137,13 @@ function getInfoRowProps(
         date: formatDateTime(previousAiring, longDateFormat, timeFormat),
       }),
       iconName: icons.CALENDAR,
-      label:
-        getRelativeDate({
-          date: previousAiring,
-          shortDateFormat,
-          showRelativeDates,
-          timeFormat,
-          timeForToday: true,
-        }) ?? '',
+      label: getRelativeDate({
+        date: previousAiring,
+        shortDateFormat,
+        showRelativeDates,
+        timeFormat,
+        timeForToday: true,
+      }),
     };
   }
 
@@ -195,10 +194,12 @@ function getInfoRowProps(
   }
 
   if (name === 'sizeOnDisk') {
+    const { sizeOnDisk = 0 } = props;
+
     return {
       title: translate('SizeOnDisk'),
       iconName: icons.DRIVE,
-      label: formatBytes(props.sizeOnDisk),
+      label: formatBytes(sizeOnDisk),
     };
   }
 
@@ -236,7 +237,9 @@ function SeriesIndexOverviewInfo(props: SeriesIndexOverviewInfoProps) {
     <div className={styles.infos}>
       {!!nextAiring && (
         <SeriesIndexOverviewInfoRow
-          title={formatDateTime(nextAiring, longDateFormat, timeFormat)}
+          title={translate('NextAiringDate', {
+            date: formatDateTime(nextAiring, longDateFormat, timeFormat),
+          })}
           iconName={icons.SCHEDULED}
           label={getRelativeDate({
             date: nextAiring,

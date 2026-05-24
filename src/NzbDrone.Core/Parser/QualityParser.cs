@@ -16,7 +16,7 @@ namespace NzbDrone.Core.Parser
 
         private static readonly Regex SourceRegex = new (@"\b(?:
                                                                 (?<bluray>BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$))|
-                                                                (?<webdl>WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|DDP?5[. ]1)|[. ](?-i:WEB)$|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|\b\s\/\sWEB\s\/\s\b|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip))|
+                                                                (?<webdl>WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?5[. ]1)|[. ](?-i:WEB)$|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|\b\s\/\sWEB\s\/\s\b|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip))|
                                                                 (?<webrip>WebRip|Web-Rip|WEBMux)|
                                                                 (?<hdtv>HDTV)|
                                                                 (?<bdrip>BDRip|BDLight)|
@@ -40,7 +40,7 @@ namespace NzbDrone.Core.Parser
         private static readonly Regex RepackRegex = new (@"\b(?<repack>repack\d?|rerip\d?)\b",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private static readonly Regex VersionRegex = new (@"\d[-._ ]?v(?<version>\d)[-._ ]|\[v(?<version>\d)\]|repack(?<version>\d)|rerip(?<version>\d)",
+        private static readonly Regex VersionRegex = new (@"\d[-._ ]?v(?<version>\d)[-._ ]|\[v(?<version>\d)\]|repack(?<version>\d)|rerip(?<version>\d)|(?:480|576|720|1080|2160)p[._ ]v(?<version>\d)",
                                                                 RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly Regex RealRegex = new (@"\b(?<real>REAL)\b",
@@ -63,7 +63,7 @@ namespace NzbDrone.Core.Parser
 
         private static readonly Regex HighDefPdtvRegex = new (@"hr[-_. ]ws", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private static readonly Regex RemuxRegex = new (@"(?:[_. ]|\d{4}p-)(?<remux>(?:(BD|UHD)[-_. ]?)?Remux)\b|(?<remux>(?:(BD|UHD)[-_. ]?)?Remux[_. ]\d{4}p)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex RemuxRegex = new (@"(?:[_. ]|\d{4}p-|\bHybrid-)(?<remux>(?:(BD|UHD)[-_. ]?)?Remux)\b|(?<remux>(?:(BD|UHD)[-_. ]?)?Remux[_. ]\d{4}p)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static QualityModel ParseQuality(string name)
         {
@@ -147,8 +147,14 @@ namespace NzbDrone.Core.Parser
                         return result;
                     }
 
-                    if (resolution == Resolution.R360P || resolution == Resolution.R480P ||
-                        resolution == Resolution.R540p || resolution == Resolution.R576p)
+                    if (resolution == Resolution.R576p)
+                    {
+                        result.Quality = Quality.Bluray576p;
+                        return result;
+                    }
+
+                    if (resolution == Resolution.R360p || resolution == Resolution.R480p ||
+                        resolution == Resolution.R540p)
                     {
                         result.Quality = Quality.Bluray480p;
                         return result;
@@ -315,7 +321,7 @@ namespace NzbDrone.Core.Parser
             {
                 result.SourceDetectionSource = QualityDetectionSource.Unknown;
 
-                if (resolution == Resolution.R480P)
+                if (resolution == Resolution.R480p)
                 {
                     result.Quality = Quality.Bluray480p;
                     return result;
@@ -345,7 +351,7 @@ namespace NzbDrone.Core.Parser
             {
                 result.SourceDetectionSource = QualityDetectionSource.Name;
 
-                if (resolution == Resolution.R360P || resolution == Resolution.R480P ||
+                if (resolution == Resolution.R360p || resolution == Resolution.R480p ||
                     resolution == Resolution.R540p || resolution == Resolution.R576p ||
                     normalizedName.ContainsIgnoreCase("480p"))
                 {
@@ -387,7 +393,7 @@ namespace NzbDrone.Core.Parser
             {
                 result.SourceDetectionSource = QualityDetectionSource.Name;
 
-                if (resolution == Resolution.R360P || resolution == Resolution.R480P ||
+                if (resolution == Resolution.R360p || resolution == Resolution.R480p ||
                     resolution == Resolution.R540p || resolution == Resolution.R576p ||
                     normalizedName.ContainsIgnoreCase("480p"))
                 {
@@ -477,7 +483,7 @@ namespace NzbDrone.Core.Parser
                     return result;
                 }
 
-                if (resolution == Resolution.R360P || resolution == Resolution.R480P ||
+                if (resolution == Resolution.R360p || resolution == Resolution.R480p ||
                     resolution == Resolution.R540p || resolution == Resolution.R576p)
                 {
                     result.ResolutionDetectionSource = QualityDetectionSource.Name;
@@ -603,12 +609,12 @@ namespace NzbDrone.Core.Parser
 
             if (match.Groups["R360p"].Success)
             {
-                return Resolution.R360P;
+                return Resolution.R360p;
             }
 
             if (match.Groups["R480p"].Success)
             {
-                return Resolution.R480P;
+                return Resolution.R480p;
             }
 
             if (match.Groups["R540p"].Success)
@@ -707,8 +713,8 @@ namespace NzbDrone.Core.Parser
 
     public enum Resolution
     {
-        R360P = 360,
-        R480P = 480,
+        R360p = 360,
+        R480p = 480,
         R540p = 540,
         R576p = 576,
         R720p = 720,

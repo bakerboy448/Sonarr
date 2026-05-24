@@ -10,6 +10,7 @@ using NzbDrone.Common.Cache;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Common.Instrumentation;
 using NzbDrone.Common.Options;
 using NzbDrone.Core.Authentication;
 using NzbDrone.Core.Configuration.Events;
@@ -38,8 +39,10 @@ namespace NzbDrone.Core.Configuration
         bool AnalyticsEnabled { get; }
         string LogLevel { get; }
         string ConsoleLogLevel { get; }
+        ConsoleLogFormat ConsoleLogFormat { get; }
         bool LogSql { get; }
         int LogRotate { get; }
+        int LogSizeLimit { get; }
         bool FilterSentryEvents { get; }
         string Branch { get; }
         string ApiKey { get; }
@@ -62,6 +65,7 @@ namespace NzbDrone.Core.Configuration
         string PostgresPassword { get; }
         string PostgresMainDb { get; }
         string PostgresLogDb { get; }
+        bool TrustCgnatIpAddresses { get; }
     }
 
     public class ConfigFileProvider : IConfigFileProvider
@@ -220,8 +224,13 @@ namespace NzbDrone.Core.Configuration
 
         public string Branch => _updateOptions.Branch ?? GetValue("Branch", "main").ToLowerInvariant();
 
-        public string LogLevel => _logOptions.Level ?? GetValue("LogLevel", "info").ToLowerInvariant();
+        public string LogLevel => _logOptions.Level ?? GetValue("LogLevel", "debug").ToLowerInvariant();
         public string ConsoleLogLevel => _logOptions.ConsoleLevel ?? GetValue("ConsoleLogLevel", string.Empty, persist: false);
+
+        public ConsoleLogFormat ConsoleLogFormat =>
+            Enum.TryParse<ConsoleLogFormat>(_logOptions.ConsoleFormat, out var enumValue)
+                ? enumValue
+                : GetValueEnum("ConsoleLogFormat", ConsoleLogFormat.Standard, false);
 
         public string Theme => _appOptions.Theme ?? GetValue("Theme", "auto", persist: false);
 
@@ -234,6 +243,7 @@ namespace NzbDrone.Core.Configuration
         public bool LogDbEnabled => _logOptions.DbEnabled ?? GetValueBoolean("LogDbEnabled", true, persist: false);
         public bool LogSql => _logOptions.Sql ?? GetValueBoolean("LogSql", false, persist: false);
         public int LogRotate => _logOptions.Rotate ?? GetValueInt("LogRotate", 50, persist: false);
+        public int LogSizeLimit => Math.Min(Math.Max(_logOptions.SizeLimit ?? GetValueInt("LogSizeLimit", 1, persist: false), 0), 10);
         public bool FilterSentryEvents => _logOptions.FilterSentryEvents ?? GetValueBoolean("FilterSentryEvents", true, persist: false);
         public string SslCertPath => _serverOptions.SslCertPath ?? GetValue("SslCertPath", "");
         public string SslCertPassword => _serverOptions.SslCertPassword ?? GetValue("SslCertPassword", "");
@@ -270,7 +280,7 @@ namespace NzbDrone.Core.Configuration
             }
         }
 
-        public bool UpdateAutomatically => _updateOptions.Automatically ?? GetValueBoolean("UpdateAutomatically", false, false);
+        public bool UpdateAutomatically => _updateOptions.Automatically ?? GetValueBoolean("UpdateAutomatically", OsInfo.IsWindows, false);
 
         public UpdateMechanism UpdateMechanism =>
             Enum.TryParse<UpdateMechanism>(_updateOptions.Mechanism, out var enumValue)
@@ -372,7 +382,7 @@ namespace NzbDrone.Core.Configuration
             }
 
             // If SSL is enabled and a cert hash is still in the config file or cert path is empty disable SSL
-            if (EnableSsl && (GetValue("SslCertHash", null).IsNotNullOrWhiteSpace() || SslCertPath.IsNullOrWhiteSpace()))
+            if (EnableSsl && (GetValue("SslCertHash", string.Empty, false).IsNotNullOrWhiteSpace() || SslCertPath.IsNullOrWhiteSpace()))
             {
                 SetValue("EnableSsl", false);
             }
@@ -466,5 +476,7 @@ namespace NzbDrone.Core.Configuration
         {
             SetValue("ApiKey", GenerateApiKey());
         }
+
+        public bool TrustCgnatIpAddresses => _authOptions.TrustCgnatIpAddresses ?? GetValueBoolean("TrustCgnatIpAddresses", false, persist: false);
     }
 }
